@@ -5,9 +5,9 @@
  * The routing rule, straight from the docs
  * (https://yieldfabric.com/docs/guides/building-with-yf):
  *
- *   DEAL-FLOW + READS → federated gateway   :4000/graphql   gatewayQuery / gatewayMutation
- *   ON-CHAIN MUTATIONS → payments-direct     :3002/graphql   paymentsMutation
- *   SETTLEMENT         → REST status polling  :3002/api/...    waitForMessage
+ *   DEAL-FLOW + READS  → federated gateway   api.yieldfabric.com/graphql   gatewayQuery / gatewayMutation
+ *   ON-CHAIN MUTATIONS → payments-direct     pay.yieldfabric.com/graphql   paymentsMutation
+ *   SETTLEMENT         → REST status polling  pay.yieldfabric.com/api/...    waitForMessage
  *
  * The DMS deal lifecycle (saveDealDraft / proposeDraft / signDeal /
  * activateDeal) and the cross-service reads (rent-schedule contracts,
@@ -65,7 +65,7 @@ async function graphqlPost<T>(
 }
 
 /** Cross-service QUERIES + the DMS deal-flow namespace ride the
- *  federated gateway (:4000). */
+ *  federated gateway. */
 export function gatewayQuery<T>(
   query: string,
   variables?: Record<string, unknown>,
@@ -87,7 +87,7 @@ export function gatewayMutation<T>(
 }
 
 /** ON-CHAIN MUTATIONS (collect / exchange / settle) go payments-direct
- *  (:3002) — the same route the first-party app's `executeGraphQLMutation`
+ *  — the same route the first-party app's `executeGraphQLMutation`
  *  takes. Pass `token` to submit acting AS a property group. */
 export function paymentsMutation<T>(
   mutation: string,

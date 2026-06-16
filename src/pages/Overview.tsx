@@ -58,22 +58,22 @@ const LIFECYCLE: Array<{ n: number; stage: string; who: string; what: string }> 
 const WIRES: Array<{ surface: string; url: string; used: string }> = [
   {
     surface: 'Auth REST',
-    url: ':3000/auth/**, /protected/jwt',
+    url: 'auth.yieldfabric.com/auth/**, /protected/jwt',
     used: 'Sign-in, refresh, the group-delegation JWT (SDK) + identity lookup — src/lib/session.ts',
   },
   {
     surface: 'Federated gateway (DMS + reads)',
-    url: ':4000/graphql',
+    url: 'api.yieldfabric.com/graphql',
     used: 'dealFlow { saveDealDraft · proposeDraft · signDeal · activateDeal · completePartyAction · automation } + reads — src/lib/dealFlow.ts',
   },
   {
     surface: 'Payments-direct (on-chain money loop)',
-    url: ':3002/graphql',
+    url: 'pay.yieldfabric.com/graphql',
     used: 'accept · swapObligorPayment · completeSwap · data-policy ops — src/lib/payments.ts, src/lib/policy.ts',
   },
   {
     surface: 'Message status + balance',
-    url: ':3002/api/users/{eid}/messages/{mid}, /balance',
+    url: 'pay.yieldfabric.com/api/users/{eid}/messages/{mid}, /balance',
     used: 'Settlement polling + confidential balances — src/lib/graphql.ts',
   },
 ];

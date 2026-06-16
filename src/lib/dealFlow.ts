@@ -12,8 +12,8 @@
  * The deal-flow GraphQL is federated under the `dealFlow` namespace
  * (served by the agents subgraph) and composed by the gateway, so every
  * field nests under `data.dealFlow.<op>` and every call here rides
- * `gatewayQuery` / `gatewayMutation` (:4000) — not the payments-direct
- * route the on-chain money loop uses.
+ * `gatewayQuery` / `gatewayMutation` (the federated gateway) — not the
+ * payments-direct route the on-chain money loop uses.
  *
  * Lifecycle: saveDealDraft → proposeDraft → (counterparty) signDeal →
  * activateDeal. Plus the two-sided automation credential

@@ -15,12 +15,12 @@ the DMS stands up the property account, the managing-agent send policy,
 and the rent obligation for you when the deal activates.
 
 ```
-Browser ── @yieldfabric/wallet ──► auth service      :3000  (sign-in, JWT, refresh, group delegation)
-        ── DMS deal-flow ────────► gateway (Apollo)  :4000  (dealFlow { saveDealDraft · proposeDraft
-                                                             · signDeal · activateDeal · automation }
-                                                             + rent-schedule contracts, entities, assets)
-        ── money loop ───────────► payments service  :3002  (accept · swapObligorPayment · completeSwap
-                                                             + balance + message-status polling)
+Browser ── @yieldfabric/wallet ──► auth service     (sign-in, JWT, refresh, group delegation)
+        ── DMS deal-flow ────────► federated gateway (dealFlow { saveDealDraft · proposeDraft
+                                                      · signDeal · activateDeal · automation }
+                                                      + rent-schedule contracts, entities, assets)
+        ── money loop ───────────► payments service  (accept · swapObligorPayment · completeSwap
+                                                      + balance + message-status polling)
 ```
 
 ## What a "rental" is here
@@ -90,16 +90,10 @@ After activation the recurring money loop runs against the live contract.
 ## Prerequisites
 
 - Node 18+
-- A reachable YieldFabric deployment and a user account on it. Either:
-  - a **local stack** — from the repo root:
-    ```bash
-    cd yieldfabric-auth      && cargo run                      # :3000
-    cd yieldfabric-payments  && cargo run                      # :3002
-    cd yieldfabric-agents    && cargo run --features service   # :3001 (NOTE the feature flag)
-    cd deploy                && ./run-router.sh                # :4000 federation gateway
-    ```
-  - or the **hosted platform** (`auth.yieldfabric.com` etc. — see
-    `.env.example`).
+- A reachable YieldFabric deployment and a user account on it — the
+  **hosted platform** (`auth.yieldfabric.com` · `pay.yieldfabric.com` ·
+  `api.yieldfabric.com`), or your own. Copy `.env.example` and point the
+  three service URLs at your deployment.
 - **SDK resolution is automatic — local source if present, else the
   published packages.** No manual switch:
   - **In the monorepo** (the sibling repos exist at
@@ -120,7 +114,7 @@ After activation the recurring money loop runs against the live contract.
 ```bash
 cp .env.example .env     # point the URLs at your YF deployment
 npm install              # monorepo: links local SDK src · standalone: pulls from registry
-npm start                # http://localhost:3023
+npm start                # start the dev server
 ```
 
 Production build: `npm run build`. Type check: `npm run typecheck` (the
@@ -154,24 +148,25 @@ auto-runs the steps it holds a capability for; steps assigned to a party
 executes). Plus the automation credential (`setDealAutomationKey` /
 `revokeDealAutomationKey`) and `dealsByParty` / `dealAutomationStatus`.
 Every call rides the **federated gateway** (`gatewayQuery` /
-`gatewayMutation`, `:4000`) because the `dealFlow { … }` namespace lives
-on the agents subgraph and is composed by the gateway — the same client
-the first-party app uses for it.
+`gatewayMutation`) because the `dealFlow { … }` namespace lives on the
+agents subgraph and is composed by the gateway — the same client the
+first-party app uses for it.
 
 ### 3. `src/lib/payments.ts` — the on-chain money loop
 
 `collectRentLeg` (`accept`), `exchangeCredit` (`swapObligorPayment`), and
 `settleExchange` (`completeSwap`) — the recurring loop after activation.
 These submit on-chain work, so they take the **payments-direct** route
-(`:3002`), and the landlord side runs **acting as the property group**
+(`pay.yieldfabric.com`), and the landlord side runs **acting as the property group**
 via a cached delegation JWT (`src/lib/delegation.ts`). Also the reads:
 the rent-schedule contracts, the entity directory, and the open-exchange
 swaps.
 
 ### 4. `src/lib/graphql.ts` — the wire primitives
 
-`gatewayQuery` / `gatewayMutation` (`:4000`), `paymentsMutation`
-(`:3002`), `fetchBalance` + `getMessage` + `waitForMessage` (REST), and
+`gatewayQuery` / `gatewayMutation` (the federated gateway),
+`paymentsMutation` (payments-direct), `fetchBalance` + `getMessage` +
+`waitForMessage` (REST), and
 `freshIdempotencyKey`. Auth is the SDK's — every call reads the current
 bearer from `tokenManager`; group-acting calls pass the delegation JWT
 explicitly. **On-chain mutations return at enqueue** (a `messageId`);
@@ -190,10 +185,10 @@ A consumer app talks to these surfaces and nothing else:
 
 | Surface | URL | Rule |
 |--|--|--|
-| Auth REST | `:3000/auth/**`, `/protected/jwt` | Sign-in, refresh, the group-delegation JWT (all SDK-owned), and the identity lookup. Read the current bearer from the SDK's `tokenManager`. |
-| Federated gateway | `:4000/graphql` | The **DMS deal-flow** namespace (`dealFlow { … }`) and cross-service **reads** (rent-schedule contracts, entities, assets). |
-| Payments-direct | `:3002/graphql` | **On-chain mutations** the DMS doesn't wrap — the money loop: `accept`, `swapObligorPayment`, `completeSwap`. |
-| Message status | `:3002/api/users/{eid}/messages/{mid}` | Mutations return when the queue **accepts** them, not when they settle. Poll until `executed` (`waitForMessage`). Keyed under the submitting entity (the group, for group-acting calls). |
+| Auth REST | `auth.yieldfabric.com/auth/**`, `/protected/jwt` | Sign-in, refresh, the group-delegation JWT (all SDK-owned), and the identity lookup. Read the current bearer from the SDK's `tokenManager`. |
+| Federated gateway | `api.yieldfabric.com/graphql` | The **DMS deal-flow** namespace (`dealFlow { … }`) and cross-service **reads** (rent-schedule contracts, entities, assets). |
+| Payments-direct | `pay.yieldfabric.com/graphql` | **On-chain mutations** the DMS doesn't wrap — the money loop: `accept`, `swapObligorPayment`, `completeSwap`. |
+| Message status | `pay.yieldfabric.com/api/users/{eid}/messages/{mid}` | Mutations return when the queue **accepts** them, not when they settle. Poll until `executed` (`waitForMessage`). Keyed under the submitting entity (the group, for group-acting calls). |
 
 Two gotchas this app encodes:
 
