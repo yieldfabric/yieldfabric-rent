@@ -1,0 +1,36 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+@layer components {
+  /* Form + layout primitives used by this app's own pages. The
+     wallet-SDK's surfaces style themselves from the semantic Tailwind
+     tokens in tailwind.config.js. */
+  .field {
+    @apply w-full rounded-md border border-line bg-white px-3 py-2 text-sm text-ink
+      placeholder:text-ink-mute focus:outline-none focus:ring-2 focus:ring-brand-200
+      focus:border-brand-400 disabled:opacity-60;
+  }
+  .btn-primary {
+    @apply inline-flex items-center justify-center rounded-md bg-brand-600 px-4 py-2
+      text-sm font-medium text-white hover:bg-brand-700 focus:outline-none
+      focus:ring-2 focus:ring-brand-300 disabled:opacity-60 disabled:cursor-not-allowed;
+  }
+  .btn-secondary {
+    @apply inline-flex items-center justify-center rounded-md border border-line bg-white
+      px-4 py-2 text-sm font-medium text-ink hover:bg-surface-alt focus:outline-none
+      focus:ring-2 focus:ring-brand-200 disabled:opacity-60 disabled:cursor-not-allowed;
+  }
+  .card {
+    @apply bg-white border border-line rounded-xl shadow-card p-5;
+  }
+  .mini-label {
+    @apply text-[10px] uppercase tracking-wider font-semibold text-ink-mute;
+  }
+}

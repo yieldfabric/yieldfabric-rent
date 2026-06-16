@@ -1,0 +1,53 @@
+{
+  "compilerOptions": {
+    "target": "es5",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "noFallthroughCasesInSwitch": true,
+    "module": "esnext",
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "preserve",
+    "baseUrl": ".",
+    "paths": {
+      // Local SDK source first, published package (node_modules) second.
+      // TS tries each entry in order and uses the first that resolves, so
+      // the monorepo typechecks against live src and a standalone checkout
+      // against the package's shipped dist/index.d.ts — no config swap.
+      "@yieldfabric/wallet": [
+        "../../yieldfabric-wallet-sdk/src",
+        "./node_modules/@yieldfabric/wallet"
+      ],
+      "@yieldfabric/wallet/*": [
+        "../../yieldfabric-wallet-sdk/src/*",
+        "./node_modules/@yieldfabric/wallet/*"
+      ],
+      "@yieldfabric/terminal": [
+        "../../yieldfabric-terminal/src",
+        "./node_modules/@yieldfabric/terminal"
+      ],
+      "@yieldfabric/terminal/*": [
+        "../../yieldfabric-terminal/src/*",
+        "./node_modules/@yieldfabric/terminal/*"
+      ],
+      // Shims for the wallet's untyped transitive deps (referenced by its
+      // bundled .d.ts in published mode; by its src in local mode).
+      "@averer/averer-websdk": ["./src/types/averer-websdk.d.ts"],
+      "@avatune/kyute-theme/react": ["./src/types/kyute-theme-react.d.ts"],
+      "react": ["./node_modules/react"],
+      "react-dom": ["./node_modules/react-dom"],
+      "zod": ["./node_modules/zod"],
+      "js-sha3": ["./node_modules/js-sha3"],
+      "@heroicons/react/*": ["./node_modules/@heroicons/react/*"]
+    }
+  },
+  "include": ["src"],
+  "exclude": ["node_modules"]
+}

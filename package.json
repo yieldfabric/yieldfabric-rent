@@ -1,0 +1,59 @@
+{
+  "name": "yieldfabric-rent",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Reference implementation: a rental / lease-management app on YieldFabric — mint monthly-rent obligations, watch the rent roll settle, accept and pay as the tenant, and automate collection with the deal-management system (DMS). Built with @yieldfabric/wallet and @yieldfabric/terminal.",
+  "license": "MIT",
+  "dependencies": {
+    "@headlessui/react": "1.7.18",
+    "@heroicons/react": "2.2.0",
+    "@stripe/stripe-js": "^9.6.0",
+    "@types/node": "16.18.86",
+    "@types/react": "18.2.61",
+    "@types/react-dom": "18.2.19",
+    "framer-motion": "12.10.5",
+    "js-sha3": "0.9.3",
+    "lucide-react": "^0.294.0",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "react-markdown": "^9.1.0",
+    "react-router-dom": "6.22.3",
+    "react-scripts": "5.0.1",
+    "typescript": "4.9.5",
+    "zod": "3.24.4"
+  },
+  "devDependencies": {
+    "@craco/craco": "^7.1.0",
+    "ajv": "^8.17.1",
+    "autoprefixer": "10.4.14",
+    "postcss": "8.4.31",
+    "tailwindcss": "3.3.0"
+  },
+  "optionalDependencies": {
+    "@yieldfabric/terminal": "^1.0.0",
+    "@yieldfabric/wallet": "^0.1.0"
+  },
+  "scripts": {
+    "start": "craco start",
+    "build": "craco build",
+    "typecheck": "tsc --noEmit",
+    "postinstall": "node scripts/setup-sdks.js"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}
