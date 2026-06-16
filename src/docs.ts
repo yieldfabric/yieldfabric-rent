@@ -12,6 +12,8 @@ export const DOCS = {
   /** The deal-management system — the narrative this whole app follows. */
   dms: `${DOCS_BASE}/docs/guides/dms`,
   dealLifecycle: `${DOCS_BASE}/docs/guides/deal-lifecycle`,
+  /** Loans — the periodic, amortizing sibling of the rental deal. */
+  loans: `${DOCS_BASE}/docs/guides/loans`,
   /** Building with YF — the public API surface + wire rules. */
   buildingWithYf: `${DOCS_BASE}/docs/guides/building-with-yf`,
   auth: `${DOCS_BASE}/docs/guides/building-with-yf#authenticate-in-30-seconds`,

@@ -211,9 +211,16 @@ exactly two things on top of the rental machinery:
   split into interest (on the outstanding balance) + principal; the platform
   advances one period at a time (`dealPeriods` / `processDealPeriod`).
 - **A principal disbursement + a transferable note.** Activation deploys a
-  loan-note class, mints the loan, **disburses the principal** (lender →
-  borrower, `instant_send`), and the borrower accepts. The note is a
-  transferable NFT — the creditor position can be sold.
+  loan-note class (`deploy_contract`, symbol `LOAN`), mints the loan into it
+  (`create_composed_contract`, linking the note class via
+  `$step.deploy_loan_class.obligation_address`), **disburses the principal**
+  (lender → borrower, `instant_send`), and the borrower accepts — a 4-node
+  setup DAG. The note is minted into a transferable class when **Sellable**
+  is checked, so the creditor position (the note NFT) can be sold. On the
+  mint node `counterpart` and `obligor` are the borrower **entity id**, never
+  a `0x…` address (the resolver looks up the wallet); don't set an empty
+  `counterpart_wallet_id` — the composed resolver treats `Some("")` as a real
+  (empty) wallet id and fails instead of falling back to the entity.
 
 The roles are **lender** (proposer; disburses, collects) and **borrower**
 (counterparty; accepts, repays). The loan files mirror the rental triad

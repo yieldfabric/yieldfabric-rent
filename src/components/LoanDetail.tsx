@@ -435,7 +435,7 @@ export default function LoanDetail({
       )}
 
       {/* ── Repayment schedule (amortization + live periods) ── */}
-      <Section title="Repayment schedule" docHref={DOCS.dms} docLabel="DMS ↗">
+      <Section title="Repayment schedule" docHref={DOCS.loans} docLabel="Loans ↗">
         <div className="flex items-center justify-between mb-3">
           <span className="text-xs text-ink-soft">
             Each repayment splits into interest (on the balance) + principal — computed by the{' '}
@@ -497,7 +497,7 @@ export default function LoanDetail({
 
       {/* ── Automation (borrower auto-pay) ── */}
       {isBorrower && isLive && (
-        <Section title="Automation" docHref={DOCS.dms} docLabel="DMS ↗">
+        <Section title="Automation" docHref={DOCS.loans} docLabel="Loans ↗">
           <p className="text-xs text-ink-soft mb-3">
             Arm auto-pay and the period scheduler fires each repayment for you under a scoped{' '}
             <code className="bg-surface-alt px-1 rounded">yf_api_…</code> credential.

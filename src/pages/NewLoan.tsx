@@ -114,7 +114,7 @@ export default function NewLoan() {
         <h1 className="text-2xl font-semibold tracking-tight text-ink-deep mt-1">New loan</h1>
         <p className="mt-2 text-sm text-ink-soft max-w-2xl">
           Define the loan terms; the app builds a periodic{' '}
-          <DocLink href={DOCS.dms} title="The deal-management system">
+          <DocLink href={DOCS.loans} title="Loans — periodic / amortizing deals">
             DMS deal plan
           </DocLink>{' '}
           with an <code className="bg-surface-alt px-1 rounded">amortizing_loan</code> cashflow and
