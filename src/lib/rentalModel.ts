@@ -162,6 +162,7 @@ export interface ScheduleLegStatus {
 // ── Low-level helpers ────────────────────────────────────────────────
 
 interface PlanNodeLike {
+  step_id?: string;
   task_name?: string;
   inputs?: Record<string, unknown>;
 }
@@ -378,6 +379,29 @@ interface ObligationLike {
   payments?: unknown;
 }
 
+/** The rent obligation node — the composed contract that carries the rent
+ *  payment schedule. Rental plans (e.g. the first-party app / canonical
+ *  template, which this app reads from the SHARED backend) mint a payment-LESS
+ *  "agency credential" via an EARLIER `create_composed_contract` (`mint_agency`),
+ *  so the FIRST composed contract is the agency credential, NOT the rent.
+ *  Selecting the first one left the schedule empty ("No rent payments defined
+ *  yet."). Pick the canonical `rent` step, then any composed contract that
+ *  declares a payment schedule, and finally fall back to the only/last composed
+ *  contract so single-obligation rentals still resolve. */
+function rentObligationNode(deal: Pick<Deal, 'plan'>): PlanNodeLike | undefined {
+  const composed = nodes(deal).filter((n) => n.task_name === 'create_composed_contract');
+  if (composed.length <= 1) return composed[0];
+  const byStepId = composed.find((n) => n.step_id === 'rent');
+  if (byStepId) return byStepId;
+  const withSchedule = composed.find(
+    (n) =>
+      parseMaybeJson<ScheduleLike>(
+        (parseMaybeJson<ObligationLike[]>(n.inputs?.obligations) ?? [])[0]?.payment_schedule
+      ) != null
+  );
+  return withSchedule ?? composed[composed.length - 1];
+}
+
 /** Project a persisted rental Deal into the view model. `null` when the
  *  deal isn't a rental. */
 export function parseRental(deal: Deal): RentalModel | null {
@@ -385,7 +409,7 @@ export function parseRental(deal: Deal): RentalModel | null {
 
   const propertyNode = nodeByTask(deal, 'create_group_account');
   const policyNode = nodeByTask(deal, 'add_data_policy');
-  const rentNode = nodeByTask(deal, 'create_composed_contract');
+  const rentNode = rentObligationNode(deal);
 
   const tenantParty = deal.parties.find((p) => p.role.toLowerCase().includes('tenant'));
   const agentParty = deal.parties.find((p) => p.role.toLowerCase().includes('agent'));
